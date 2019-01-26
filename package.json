@@ -1,12 +1,12 @@
 {
-  "name": "node-sass-json-importer",
-  "version": "3.3.1",
+  "name": "ass-json-importer",
+  "version": "1.0.0",
   "description": "Allows importing json in sass files parsed by node-sass.",
-  "main": "dist/node-sass-json-importer.js",
+  "main": "dist/sass-json-importer.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Updater/node-sass-json-importer.git"
+    "url": "https://github.com/One-Nexus/sass-json-importer.git"
   },
   "keywords": [
     "sass",
@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "test": "mocha --compilers js:babel/register",
-    "compile": "mkdirp dist && babel -o dist/node-sass-json-importer.js src/index.js",
+    "compile": "mkdirp dist && babel -o dist/sass-json-importer.js src/index.js",
     "prepublish": "npm run compile"
   },
   "peerDependencies": {
