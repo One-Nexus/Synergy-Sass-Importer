@@ -1,7 +1,7 @@
 import _        from 'lodash';
 import isThere  from 'is-there';
 import sass     from 'node-sass';
-import path, {resolve, basename, extname} from 'path';
+import path, { resolve, basename, extname } from 'path';
 
 import 'json5/lib/register'; // Enable JSON5 support
 
@@ -102,7 +102,7 @@ export function parseMap(map) {
     const keys = Object.keys(map).map(key => {
         try {
             sass.renderSync({
-                data: `$foo: (${key}: 'foo');`
+                data: `$foo: (${key}: 'value');`
             });
 
             return key;

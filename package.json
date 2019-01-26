@@ -1,7 +1,7 @@
 {
-  "name": "ass-json-importer",
+  "name": "@onenexus/sass-json-importer",
   "version": "1.0.0",
-  "description": "Allows importing json in sass files parsed by node-sass.",
+  "description": "A Node-Sass importer to allow for importing of JSON files",
   "main": "dist/sass-json-importer.js",
   "license": "MIT",
   "repository": {

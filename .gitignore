@@ -1,5 +1,7 @@
-node_modules/
-dist/
-*.sublime*
-.idea/
-*.iml
+.idea
+.settings
+.vscode
+debug.log
+docs
+node_modules
+dist
