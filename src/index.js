@@ -111,7 +111,6 @@ export function parseMap(map) {
             return `"${key}"`;
         }
     });
-    
 
     return `(${keys.filter(key => isValidKey(key)).map(key => {
         return `${key}: ${parseValue(map[key.replace(/"/g,"")])}`;
@@ -125,7 +124,7 @@ export function parseMap(map) {
 export function valueShouldBeStringified(value) {
     try {
         sass.renderSync({
-            data: `$foo: ${value};`
+            data: `$foo: (key: ${value});`
         });
 
         return false;
