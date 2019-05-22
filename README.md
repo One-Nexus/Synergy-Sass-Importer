@@ -1,30 +1,34 @@
-# node-sass-json-importer
+<img height="56px" src="http://www.onenexus.io/synergy/github-logo.png" />
 
-JSON importer for [node-sass](https://github.com/sass/node-sass). Allows `@import`ing `.json` or `.json5` files in Sass files parsed by `node-sass`.
+> Import JavaScript/JSON files into Sass
 
-[![npm](https://img.shields.io/npm/v/node-sass-json-importer.svg)](https://www.npmjs.com/package/node-sass-json-importer)
-[![build status](https://travis-ci.org/Updater/node-sass-json-importer.svg?branch=master)](https://travis-ci.org/Updater/node-sass-json-importer)
+Synergy-Sass-Importer allows you to import JavaScript/JSON/json5 files into your Sass file. It was built for the [Synergy framework](https://github.com/One-Nexus/Synergy) but can be used with any projects that use Node.js and Sass. 
 
-## Usage
+* [Setup](#setup)
+* [Usage](#usage)
+
+## Setup
+
 ### [node-sass](https://github.com/sass/node-sass)
+
 This module hooks into [node-sass's importer api](https://github.com/sass/node-sass#importer--v200---experimental).
 
 ```javascript
 var sass = require('node-sass');
-var jsonImporter = require('node-sass-json-importer');
+var SynergySassImporter = require('@onenexus/synergy-sass-importer');
 
 // Example 1
 sass.render({
   file: scss_filename,
-  importer: jsonImporter,
-  [, options..]
+  importer: SynergySassImporter,
+  ...options
 }, function(err, result) { /*...*/ });
 
 // Example 2
 var result = sass.renderSync({
   data: scss_content
-  importer: [jsonImporter, someOtherImporter]
-  [, options..]
+  importer: [SynergySassImporter, someOtherImporter]
+  ...options
 });
 ```
 
@@ -33,82 +37,174 @@ var result = sass.renderSync({
 To run this using node-sass CLI, point `--importer` to your installed json importer, for example: 
 
 ```sh
-./node_modules/.bin/node-sass --importer node_modules/node-sass-json-importer/dist/node-sass-json-importer.js --recursive ./src --output ./dist
+node-sass /PATH/TO/app.scss --importer node_modules/synergy-sass-importer/dist/synergy-sass-importer.js
 ```
 
 ### Webpack / [sass-loader](https://github.com/jtangelder/sass-loader)
 
-#### Webpack v1
+######ES6 Imports
 
-```javascript
-import jsonImporter from 'node-sass-json-importer';
-
-// Webpack config
-export default {
-  module: {
-    loaders: [{
-      test: /\.scss$/,
-      loaders: ["style", "css", "sass"]
-    }],
-  },
-  // Apply the JSON importer via sass-loader's options.
-  sassLoader: {
-    importer: jsonImporter
-  }
-};
+```js
+import SassJSONImporter from '@onenexus/sass-json-importer';
 ```
 
-#### Webpack v2
+###### CommonJS
 
-```javascript
-import jsonImporter from 'node-sass-json-importer';
-
-// Webpack config
-export default {
-  module: {
-    rules: [
-      test: /\.scss$/,
-      use: [
-        'style-loader',
-        {
-          loader: 'css-loader',
-          options: {
-            importLoaders: 1
-          },
-        },
-        {
-          loader: 'sass-loader',
-          // Apply the JSON importer via sass-loader's options.
-          options: {
-            importer: jsonImporter,
-          },
-        },
-      ],
-    ],
-  },
-};
+```js
+const SassJSONImporter = require('@onenexus/sass-json-importer');
 ```
 
-## Importing strings
-Since JSON doesn't map directly to SASS's data types, a common source of confusion is how to handle strings. While [SASS allows strings to be both quoted and unquoted](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#sass-script-strings), strings containing spaces, commas and/or other special characters have to be wrapped in quotes. In terms of JSON, this means the string has to be double quoted:
+###### Configuration
 
-##### Incorrect
-```json
+```js
 {
-  "description": "A sentence with spaces."
+    test: /\.scss$/,
+    use: [
+        {
+            loader: 'sass-loader', 
+            options: {
+                importer: SynergySassImporter
+            }
+        }
+    ]
 }
 ```
 
-##### Correct
-```json
-{
-  "description": "'A sentence with spaces.'"
+## Usage
+
+Once your Sass compiler has been setup to use `Synergy-Sass-Importer`, you can begin to import JavaScript/JSON files in your `.scss` files. The purpose of `Synergy-Sass-Importer` is to provide [configuration](#todo) for [Synergy modules](#todo), but this essentially can be translated to "provide data to Sass components". This usage guide will assume you are using `Synergy-Sass-Importer` to provide configuration for some UI component that you are styling with Sass, with a rational of being able to share configuration between Sass and JavaScript.
+
+### JavaScript
+
+Using JavaScript to handle your component's configuration is the most flexible means to do it. It allows you to easily use framework-agnostic JavaScript-based themes within your project as well as allows for logic within your component's configuration. Configuration should be exported from its own file.
+
+#### File Exports an Object
+
+If your JavaScript configuration file exports a plain JavaScript object, please see the [`JSON`](#json) section for static configuration where the same rules apply. If you require themeing or any sort of logic, consider [exporting a function](#file-exports-a-function) instead.
+
+#### File Exports a Function
+
+This is the most flexible way to handle a UI component's configuration ([learn more](#TODO)). It allows you to use themes and easily share properties accross components. Simply export a function that takes an optional single parameter as the input. The parameter will expose the project's theme ([learn more](#todo)). The function should return an object. The object will be converted to a Sass map and attached to a `$config` variable which will be exposed to Sass.
+
+###### config.js
+
+```js
+export default (theme) => ({
+    'name': 'myModule',
+    'color': theme.colors.secondary,
+    ...
+})
+```
+
+###### styles.scss
+
+```scss
+@import 'config.js'; // `$config` will now be defined in Sass
+
+.mySelector {
+    color: map-get($config, 'color');
 }
 ```
 
-See discussion here for more:
+##### Theme
 
-https://github.com/Updater/node-sass-json-importer/pull/5
+Using JavaScript for configuration allows you to expose a theme to your configuration, allowing you to share properties between components. Your theme should exist as a separate JavaScript file which should export either an object or a function which returns an object. This object will be passed as the argument to your [component's configuration fucntion](#file-exports-a-function). 
 
-## Thanks to
-This module is based on the [sass-json-vars](https://github.com/vigetlabs/sass-json-vars) gem, which unfortunately isn't compatible with `node-sass`.
+If exporting a function in your theme's file, you can pass an optional `foundation` theme argument, should you wish to have a foundation theme on which to base your themes, to prevent common properties from having to be duplicated.
+
+###### Setting Asset Paths
+
+In order for your theme's to make their way into Sass, the Node.js environment will at some point need to know where the files are stored. The following options can be added to a JSON file as either top-level keys, under an 'options' key, or under a 'Synergy' key (allowing you to use something like an existing `package.json` file) in order to help Node.js locate the relevent files:
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Option</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>[THEMES_PATH]</code></td>
+            <td><code>'src/themes/'</code></td>
+            <td>[Optional] The path to your themes directory (relative to the project root)</td>
+        </tr>
+        <tr>
+            <td><code>[THEME_NAME]</code></td>
+            <td><code>undefined</code></td>
+            <td>[Optional] The name of the theme you are using when compiling</td>
+        </tr>
+        <tr>
+            <td><code>[FOUNDATION_FILE]</code></td>
+            <td><code>undefined</code></td>
+            <td>[Optional] The path to a file (relative to the project root) which exports an object to act as your theme's foundation</td>
+        </tr>
+        <tr>
+            <td><code><a href="#cast-config-to-sass">[CAST_CONFIG_TO_SASS]</a></code></td>
+            <td><code>null</code></td>
+            <td>[Optional] If <code>true</code>, all options will be output to the JSON file and available as variables in your Sass</td>
+        </tr>
+    </tbody>
+</table>
+
+The path to this JSON file should be passed to your CLI when executing whatever script compiles your Sass under the `Synergy` flag, e.g. `./myScript.js --Synergy='src/app.json'`(the path should be relative to the working directory from where the script is executed).
+
+### JSON
+
+JSON files are useful for static configuration, but if you require themeing or any sort of logic, consider using [JavaScript](#javascript) instead. 
+
+It's important to note that upon importing a `.json` file into your `.scss` file, the top-level keys become available as variables:
+
+###### /config.json
+
+```js
+{
+    "foo": "red",
+    "bar": {
+        "qux": "10px"
+    }
+}
+```
+
+###### /styles.scss
+
+```scss
+@import 'config.json';
+
+.fizz {
+    color: $foo;
+    height: map-get($bar, 'qux');
+}
+```
+
+###### Output
+
+```css
+.fizz {
+    color: red;
+    height: 10px;
+}
+```
+
+A good way to organise JSON configuration files is to have a single top-level key called `config` which contains your module's configuration:
+
+```js
+{
+    "config": {
+        "name": "myModule",
+        "color": "red",
+        ...
+    }
+}
+```
+
+...which can then be accessed in your Sass like so:
+
+```scss
+@import 'config.json';
+
+.fizz {
+    color: map-get($config, 'color');
+}
+```

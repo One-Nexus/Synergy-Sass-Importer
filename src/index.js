@@ -1,7 +1,8 @@
-import _        from 'lodash';
-import isThere  from 'is-there';
-import sass     from 'node-sass';
+import _ from 'lodash';
+import isThere from 'is-there';
+import sass from 'node-sass';
 import path, { resolve, basename, extname } from 'path';
+import deepExtend from 'deep-extend';
 
 import 'json5/lib/register'; // Enable JSON5 support
 
@@ -28,14 +29,20 @@ export default function(url, prev) {
     delete require.cache[require.resolve(fileName)];
 
     try {
-        const fileContents = require(fileName);
+        let fileContents = require(fileName);
+        if (fileContents.default) fileContents = fileContents.default;
         const extensionlessFilename = basename(fileName, extname(fileName));
+
+        if (typeof fileContents === 'function') {
+            fileContents = fileContents(generateTheme());
+        }
+
         const json = Array.isArray(fileContents) ? { [extensionlessFilename]: fileContents } : fileContents;
 
         return {
-            contents: transformJSONtoSass(json),
+            contents: transformJSONtoSass({ config: json }),
         }
-    } 
+    }
     catch(error) {
         return new Error(`node-sass-json-importer: Error transforming JSON/JSON5 to SASS. Check if your JSON/JSON5 parses correctly. ${error}`);
     }
@@ -43,14 +50,53 @@ export default function(url, prev) {
 
 /**
  * 
- * @param {*} url 
  */
-export function isJSONfile(url) {
-    return /\.json5?$/.test(url);
+export function generateTheme() {
+    // Core Constants
+    const PROJECT_ROOT = process.cwd() + '/';
+    const CONF_ARG = process.argv.slice(2).filter(arg => {
+        return arg.indexOf('--Synergy=') === 0;
+    })[0].split('--Synergy=')[1];
+    const CONFG_OBJ = CONF_ARG && require(PROJECT_ROOT + CONF_ARG);
+    let CONFIG = CONFG_OBJ ? (CONFG_OBJ.app || CONFG_OBJ) : {};
+    if (CONFIG.Synergy) CONFIG = CONFIG.Synergy;
+    else if (CONFIG.options) CONFIG = CONFIG.options;
+
+    // Misc Config
+    const FOUNDATION_FILE = CONFIG.FOUNDATION_FILE; // relative to PROJECT_ROOT
+
+    // UI Assets
+    let FOUNDATION = FOUNDATION_FILE && Object.assign({}, require(PROJECT_ROOT + FOUNDATION_FILE)) || {};
+    FOUNDATION = FOUNDATION.default ? FOUNDATION.default : FOUNDATION;
+
+    // Theme
+    const THEME_NAME = CONFIG.THEME_NAME;
+    const THEMES_PATH = CONFIG.THEMES_PATH || 'src/themes/'; // relative to PROJECT_ROOT
+    let THEME_FILE;
+    try {
+        THEME_FILE = require(PROJECT_ROOT + THEMES_PATH + `/${THEME_NAME}.js`).default;
+    } catch(e) {
+        THEME_FILE = require(PROJECT_ROOT + THEMES_PATH + `/${THEME_NAME}.json`);
+    }
+    let THEME = THEME_FILE;
+    if (typeof THEME === 'function') {
+        THEME = THEME(FOUNDATION);
+    }
+    if (THEME.theme) {
+        THEME = THEME.theme;
+    }
+
+    return deepExtend(FOUNDATION, THEME, CONFIG.ui);
 }
 
 /**
- * 
+ * @param {*} url 
+ */
+export function isJSONfile(url) {
+    return (/\.(js)(on(5)?|s)?$/.test(url));
+}
+
+/**
  * @param {*} json 
  */
 export function transformJSONtoSass(json) {
@@ -60,7 +106,6 @@ export function transformJSONtoSass(json) {
 }
 
 /**
- * 
  * @param {*} key 
  */
 export function isValidKey(key) {
@@ -68,7 +113,6 @@ export function isValidKey(key) {
 }
 
 /**
- * 
  * @param {*} value 
  */
 export function parseValue(value) {
@@ -87,7 +131,6 @@ export function parseValue(value) {
 }
 
 /**
- * 
  * @param {*} list 
  */
 export function parseList(list) {
@@ -95,7 +138,6 @@ export function parseList(list) {
 }
 
 /**
- * 
  * @param {*} map 
  */
 export function parseMap(map) {
@@ -118,7 +160,6 @@ export function parseMap(map) {
 }
 
 /**
- * 
  * @param {*} value 
  */
 export function valueShouldBeStringified(value) {
