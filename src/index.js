@@ -52,13 +52,12 @@ export default function(url, prev) {
  * 
  */
 export function generateTheme() {
-    console.log('tug', global.Synergy)
     // Core Constants
     const PROJECT_ROOT = process.cwd() + '/';
     const CONF_ARG = process.argv.slice(2).filter(arg => {
         return arg.indexOf('--Synergy=') === 0;
     })[0].split('--Synergy=')[1];
-    const CONFG_OBJ = CONF_ARG && require(PROJECT_ROOT + CONF_ARG);
+    const CONFG_OBJ = CONF_ARG ? require(PROJECT_ROOT + CONF_ARG) : global.Synergy;
     let CONFIG = CONFG_OBJ ? (CONFG_OBJ.app || CONFG_OBJ) : {};
     if (CONFIG.Synergy) CONFIG = CONFIG.Synergy;
     else if (CONFIG.options) CONFIG = CONFIG.options;

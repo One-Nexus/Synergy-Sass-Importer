@@ -9,7 +9,7 @@ Synergy-Sass-Importer allows you to import JavaScript/JSON/json5 files into your
 
 # Setup
 
-## [node-sass](https://github.com/sass/node-sass)
+### [node-sass](https://github.com/sass/node-sass)
 
 This module hooks into [node-sass's importer api](https://github.com/sass/node-sass#importer--v200---experimental).
 
@@ -32,7 +32,7 @@ var result = sass.renderSync({
 });
 ```
 
-## [node-sass](https://github.com/sass/node-sass) command-line interface
+### [node-sass](https://github.com/sass/node-sass) command-line interface
 
 To run this using node-sass CLI, point `--importer` to your installed json importer, for example: 
 
@@ -40,7 +40,7 @@ To run this using node-sass CLI, point `--importer` to your installed json impor
 node-sass /PATH/TO/app.scss --importer node_modules/synergy-sass-importer/dist/synergy-sass-importer.js
 ```
 
-## Webpack / [sass-loader](https://github.com/jtangelder/sass-loader)
+### Webpack / [sass-loader](https://github.com/jtangelder/sass-loader)
 
 ###### ES6 Imports
 
@@ -114,7 +114,7 @@ If exporting a function in your theme's file, you can pass an optional `foundati
 
 ##### Setting Asset Paths
 
-In order for your theme's to make their way into Sass, the Node.js environment will at some point need to know where the files are stored. The following options can be added to a JSON file as either top-level keys, under an 'options' key, or under a 'Synergy' key (allowing you to use something like an existing `package.json` file) in order to help Node.js locate the relevent files:
+In order for your theme's to make their way into Sass, the Node.js environment will at some point need to know where the files are stored. The following options can be added to either [node's `global` object](https://nodejs.org/api/globals.html#globals_global) under the `Synergy` key (i.e `global.Synergy`), or a JSON file as either top-level keys, under an 'options' key, or under a 'Synergy' key (allowing you to use something like an existing `package.json` file) in order to help Node.js locate the relevent files:
 
 <table class="table">
     <thead>
