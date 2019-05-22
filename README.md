@@ -7,9 +7,9 @@ Synergy-Sass-Importer allows you to import JavaScript/JSON/json5 files into your
 * [Setup](#setup)
 * [Usage](#usage)
 
-## Setup
+# Setup
 
-### [node-sass](https://github.com/sass/node-sass)
+## [node-sass](https://github.com/sass/node-sass)
 
 This module hooks into [node-sass's importer api](https://github.com/sass/node-sass#importer--v200---experimental).
 
@@ -32,7 +32,7 @@ var result = sass.renderSync({
 });
 ```
 
-### [node-sass](https://github.com/sass/node-sass) command-line interface
+## [node-sass](https://github.com/sass/node-sass) command-line interface
 
 To run this using node-sass CLI, point `--importer` to your installed json importer, for example: 
 
@@ -40,9 +40,9 @@ To run this using node-sass CLI, point `--importer` to your installed json impor
 node-sass /PATH/TO/app.scss --importer node_modules/synergy-sass-importer/dist/synergy-sass-importer.js
 ```
 
-### Webpack / [sass-loader](https://github.com/jtangelder/sass-loader)
+## Webpack / [sass-loader](https://github.com/jtangelder/sass-loader)
 
-######ES6 Imports
+###### ES6 Imports
 
 ```js
 import SassJSONImporter from '@onenexus/sass-json-importer';
@@ -70,19 +70,19 @@ const SassJSONImporter = require('@onenexus/sass-json-importer');
 }
 ```
 
-## Usage
+# Usage
 
 Once your Sass compiler has been setup to use `Synergy-Sass-Importer`, you can begin to import JavaScript/JSON files in your `.scss` files. The purpose of `Synergy-Sass-Importer` is to provide [configuration](#todo) for [Synergy modules](#todo), but this essentially can be translated to "provide data to Sass components". This usage guide will assume you are using `Synergy-Sass-Importer` to provide configuration for some UI component that you are styling with Sass, with a rational of being able to share configuration between Sass and JavaScript.
 
-### JavaScript
+## JavaScript
 
 Using JavaScript to handle your component's configuration is the most flexible means to do it. It allows you to easily use framework-agnostic JavaScript-based themes within your project as well as allows for logic within your component's configuration. Configuration should be exported from its own file.
 
-#### File Exports an Object
+### File Exports an Object
 
 If your JavaScript configuration file exports a plain JavaScript object, please see the [`JSON`](#json) section for static configuration where the same rules apply. If you require themeing or any sort of logic, consider [exporting a function](#file-exports-a-function) instead.
 
-#### File Exports a Function
+### File Exports a Function
 
 This is the most flexible way to handle a UI component's configuration ([learn more](#TODO)). It allows you to use themes and easily share properties accross components. Simply export a function that takes an optional single parameter as the input. The parameter will expose the project's theme ([learn more](#todo)). The function should return an object. The object will be converted to a Sass map and attached to a `$config` variable which will be exposed to Sass.
 
@@ -106,13 +106,13 @@ export default (theme) => ({
 }
 ```
 
-##### Theme
+#### Theme
 
 Using JavaScript for configuration allows you to expose a theme to your configuration, allowing you to share properties between components. Your theme should exist as a separate JavaScript file which should export either an object or a function which returns an object. This object will be passed as the argument to your [component's configuration fucntion](#file-exports-a-function). 
 
 If exporting a function in your theme's file, you can pass an optional `foundation` theme argument, should you wish to have a foundation theme on which to base your themes, to prevent common properties from having to be duplicated.
 
-###### Setting Asset Paths
+##### Setting Asset Paths
 
 In order for your theme's to make their way into Sass, the Node.js environment will at some point need to know where the files are stored. The following options can be added to a JSON file as either top-level keys, under an 'options' key, or under a 'Synergy' key (allowing you to use something like an existing `package.json` file) in order to help Node.js locate the relevent files:
 
@@ -150,7 +150,7 @@ In order for your theme's to make their way into Sass, the Node.js environment w
 
 The path to this JSON file should be passed to your CLI when executing whatever script compiles your Sass under the `Synergy` flag, e.g. `./myScript.js --Synergy='src/app.json'`(the path should be relative to the working directory from where the script is executed).
 
-### JSON
+## JSON
 
 JSON files are useful for static configuration, but if you require themeing or any sort of logic, consider using [JavaScript](#javascript) instead. 
 

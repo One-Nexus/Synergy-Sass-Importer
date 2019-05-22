@@ -52,6 +52,7 @@ export default function(url, prev) {
  * 
  */
 export function generateTheme() {
+    console.log('tug', global.Synergy)
     // Core Constants
     const PROJECT_ROOT = process.cwd() + '/';
     const CONF_ARG = process.argv.slice(2).filter(arg => {
