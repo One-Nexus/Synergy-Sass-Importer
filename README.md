@@ -110,11 +110,11 @@ export default (theme) => ({
 
 Using JavaScript for configuration allows you to expose a theme to your configuration, allowing you to share properties between components. Your theme should exist as a separate JavaScript file which should export either an object or a function which returns an object. This object will be passed as the argument to your [component's configuration fucntion](#file-exports-a-function). 
 
-If exporting a function in your theme's file, you can pass an optional `foundation` theme argument, should you wish to have a foundation theme on which to base your themes, to prevent common properties from having to be duplicated.
+If exporting a function in your theme's file, you can pass an optional [`foundation`](#todo) theme argument, should you wish to have a foundation theme on which to base your themes, to prevent common properties from having to be duplicated.
 
-##### Setting Asset Paths
+##### Passing Assets Through Node
 
-In order for your theme's to make their way into Sass, the Node.js environment will at some point need to know where the files are stored. The following options can be added to either [node's `global` object](https://nodejs.org/api/globals.html#globals_global) under the `Synergy` key (i.e `global.Synergy`), or a JSON file as either top-level keys, under an 'options' key, or under a 'Synergy' key (allowing you to use something like an existing `package.json` file) in order to help Node.js locate the relevent files:
+By attaching your assets to `global.Synergy` before executing anything that compiles your Sass, they will be passed to `Synergy-Sass-Importer`.
 
 <table class="table">
     <thead>
@@ -126,29 +126,35 @@ In order for your theme's to make their way into Sass, the Node.js environment w
     </thead>
     <tbody>
         <tr>
-            <td><code>[THEMES_PATH]</code></td>
-            <td><code>'src/themes/'</code></td>
-            <td>[Optional] The path to your themes directory (relative to the project root)</td>
+            <td><code>[THEME]</code></td>
+            <td><code>undefined</code></td>
+            <td>[Optional] A file which exports an object or a function which returns an object to act as your theme</td>
         </tr>
         <tr>
-            <td><code>[THEME_NAME]</code></td>
+            <td><code>[FOUNDATION]</code></td>
             <td><code>undefined</code></td>
-            <td>[Optional] The name of the theme you are using when compiling</td>
-        </tr>
-        <tr>
-            <td><code>[FOUNDATION_FILE]</code></td>
-            <td><code>undefined</code></td>
-            <td>[Optional] The path to a file (relative to the project root) which exports an object to act as your theme's foundation</td>
+            <td>[Optional] A file which exports an object to act as your theme's foundation</td>
         </tr>
         <tr>
             <td><code><a href="#cast-config-to-sass">[CAST_CONFIG_TO_SASS]</a></code></td>
             <td><code>null</code></td>
-            <td>[Optional] If <code>true</code>, all options will be output to the JSON file and available as variables in your Sass</td>
+            <td>[Optional] If <code>true</code>, all options under <code>global.Synergy</code> will be available as variables in your Sass</td>
         </tr>
     </tbody>
 </table>
 
-The path to this JSON file should be passed to your CLI when executing whatever script compiles your Sass under the `Synergy` flag, e.g. `./myScript.js --Synergy='src/app.json'`(the path should be relative to the working directory from where the script is executed).
+```js
+global.Synergy = {
+    THEME: require('src/themes/myTheme.js'),
+    FOUNDATION: require('src/foundation),
+    CAST_CONFIG_TO_SASS: true,
+    ...
+}
+```
+
+##### Foundation Theme
+
+@TODO
 
 ## JSON
 

@@ -16,6 +16,8 @@ export default function(url, prev) {
         return null;
     }
 
+    var Synergy = global.Synergy || {};
+
     let includePaths = this.options.includePaths ? this.options.includePaths.split(path.delimiter) : [];
     let paths = [].concat(prev.slice(0, prev.lastIndexOf('/'))).concat(includePaths);
     let fileName = paths.map(path => resolve(path, url)).filter(isThere).pop();
@@ -29,18 +31,29 @@ export default function(url, prev) {
     delete require.cache[require.resolve(fileName)];
 
     try {
-        let fileContents = require(fileName);
-        if (fileContents.default) fileContents = fileContents.default;
         const extensionlessFilename = basename(fileName, extname(fileName));
 
-        if (typeof fileContents === 'function') {
-            fileContents = fileContents(generateTheme());
+        let data = require(fileName);
+        if (data.default) data = data.default;
+
+        let theme = {};
+
+        if (typeof data === 'function') {
+            theme = deepExtend(Synergy.THEME || {}, Synergy.CONFIG && Synergy.CONFIG.theme);
+            const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
+            data = deepExtend(data(theme), theme.modules[MODULE_NAME]);
         }
 
-        const json = Array.isArray(fileContents) ? { [extensionlessFilename]: fileContents } : fileContents;
+        if (data.config) data = data.config;
+
+        if (Array.isArray(data)) data = { [extensionlessFilename]: data };
 
         return {
-            contents: transformJSONtoSass({ config: json }),
+            contents: transformJSONtoSass({
+                config: evalConfig(data),
+                theme: theme,
+                ...(Synergy.CAST_TO_SASS)
+            }),
         }
     }
     catch(error) {
@@ -49,44 +62,23 @@ export default function(url, prev) {
 }
 
 /**
- * 
+ * Evaluate module config properties
+ * @param {*} config 
  */
-export function generateTheme() {
-    // Core Constants
-    const PROJECT_ROOT = process.cwd() + '/';
-    const CONF_ARG = process.argv.slice(2).filter(arg => {
-        return arg.indexOf('--Synergy=') === 0;
-    })[0].split('--Synergy=')[1];
-    const CONFG_OBJ = CONF_ARG ? require(PROJECT_ROOT + CONF_ARG) : global.Synergy;
-    let CONFIG = CONFG_OBJ ? (CONFG_OBJ.app || CONFG_OBJ) : {};
-    if (CONFIG.Synergy) CONFIG = CONFIG.Synergy;
-    else if (CONFIG.options) CONFIG = CONFIG.options;
+function evalConfig(config) {
+    if (!config) return;
 
-    // Misc Config
-    const FOUNDATION_FILE = CONFIG.FOUNDATION_FILE; // relative to PROJECT_ROOT
+    Object.entries(config).forEach(([key, value]) => {
+        if (typeof value === 'object') {
+            return evalConfig(value);
+        } else {
+            if (typeof value !== 'function') return;
 
-    // UI Assets
-    let FOUNDATION = FOUNDATION_FILE && Object.assign({}, require(PROJECT_ROOT + FOUNDATION_FILE)) || {};
-    FOUNDATION = FOUNDATION.default ? FOUNDATION.default : FOUNDATION;
+            return config[key] = value();
+        }
+    });
 
-    // Theme
-    const THEME_NAME = CONFIG.THEME_NAME;
-    const THEMES_PATH = CONFIG.THEMES_PATH || 'src/themes/'; // relative to PROJECT_ROOT
-    let THEME_FILE;
-    try {
-        THEME_FILE = require(PROJECT_ROOT + THEMES_PATH + `/${THEME_NAME}.js`).default;
-    } catch(e) {
-        THEME_FILE = require(PROJECT_ROOT + THEMES_PATH + `/${THEME_NAME}.json`);
-    }
-    let THEME = THEME_FILE;
-    if (typeof THEME === 'function') {
-        THEME = THEME(FOUNDATION);
-    }
-    if (THEME.theme) {
-        THEME = THEME.theme;
-    }
-
-    return deepExtend(FOUNDATION, THEME, CONFIG.ui);
+    return config;
 }
 
 /**
@@ -116,6 +108,9 @@ export function isValidKey(key) {
  * @param {*} value 
  */
 export function parseValue(value) {
+    if (typeof value === 'function') {
+        return '"[function]"'
+    }
     if (_.isArray(value)) {
         return parseList(value);
     }
