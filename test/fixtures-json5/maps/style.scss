@@ -1,5 +1,5 @@
 @import 'variables.json5';
 
 body {
-  color: map-get($colors, red);
+  color: map-get(map-get($variables, 'colors'), red);
 }

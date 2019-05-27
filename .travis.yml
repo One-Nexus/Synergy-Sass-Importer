@@ -1,6 +1,10 @@
 language: node_js
 node_js:
-  - "6"
-  - "5"
-notifications:
-  email: false
+  - 8
+install: 
+  - npm install
+  - npm install -g codecov
+before_script: 
+  - npm run build
+script:
+  - codecov

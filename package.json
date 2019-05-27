@@ -1,24 +1,21 @@
 {
-  "name": "@onenexus/sass-json-importer",
-  "version": "1.0.0",
-  "description": "A Node-Sass importer to allow for importing of JSON files",
-  "main": "dist/sass-json-importer.js",
+  "name": "@onenexus/synergy-sass-importer",
+  "version": "1.0.0-beta.0",
+  "description": "Import JavaScript/JSON files into Sass",
+  "main": "dist/synergy-sass-importer.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/One-Nexus/sass-json-importer.git"
+    "url": "https://github.com/One-Nexus/synergy-sass-importer.git"
   },
   "keywords": [
+    "synergy",
     "sass",
     "node-sass",
     "importer",
+    "javascript",
     "json"
   ],
-  "scripts": {
-    "test": "mocha --compilers js:babel/register",
-    "build": "mkdirp dist && babel -o dist/sass-json-importer.js src/index.js",
-    "prepublish": "npm run compile"
-  },
   "peerDependencies": {
     "node-sass": ">=3.5.3"
   },
@@ -33,5 +30,9 @@
     "chai": "^3.2.0",
     "mocha": "^2.3.2",
     "node-sass": ">=3.5.3"
+  },
+  "scripts": {
+    "test": "mocha --compilers js:babel/register",
+    "build": "npm test && mkdirp dist && babel -o dist/synergy-sass-importer.js src/index.js"
   }
 }

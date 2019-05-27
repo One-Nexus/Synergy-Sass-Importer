@@ -12,7 +12,7 @@ import 'json5/lib/register'; // Enable JSON5 support
  * @param {*} prev 
  */
 export default function(url, prev) {
-    if (!isJSONfile(url)) {
+    if (!isValidFile(url)) {
         return null;
     }
 
@@ -45,7 +45,7 @@ export default function(url, prev) {
             Synergy.THEME = deepExtend(data, Synergy.APP && Synergy.APP.theme);
 
             return {
-                contents: transformJSONtoSass({ theme: data })
+                contents: transformJStoSass({ theme: data })
             }
         }
 
@@ -54,7 +54,7 @@ export default function(url, prev) {
 
             const FOUNDATION = Object.assign({}, Synergy.FOUNDATION);
             const THEME =  typeof Synergy.THEME === 'function' ? Synergy.THEME(FOUNDATION) : Synergy.THEME;
-            const GLOBAL_VARS = Synergy.APP && (Synergy.APP.config ? Synergy.APP.config : Synergy.APP.Synergy);
+            const GLOBAL_VARS = Synergy.APP && (Synergy.APP.options ? Synergy.APP.options : Synergy.APP.Synergy);
     
             if (typeof data === 'function') {
                 theme = deepExtend(FOUNDATION, THEME, Synergy.APP && Synergy.APP.theme);
@@ -72,7 +72,7 @@ export default function(url, prev) {
             }
 
             return {
-                contents: transformJSONtoSass({
+                contents: transformJStoSass({
                     [extensionlessFilename]: evalConfig(data),
                     theme: theme,
                     ...(GLOBAL_VARS)
@@ -108,14 +108,14 @@ function evalConfig(config) {
 /**
  * @param {*} url 
  */
-export function isJSONfile(url) {
+export function isValidFile(url) {
     return (/\.(js)(on(5)?|s)?$/.test(url));
 }
 
 /**
  * @param {*} json 
  */
-export function transformJSONtoSass(json) {
+export function transformJStoSass(json) {
     return Object.keys(json).filter(key => isValidKey(key)).filter(key => json[key] !== '#').map(key => {
         return `$${key}: ${parseValue(json[key])};`
     }).join('\n');
