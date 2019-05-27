@@ -16,7 +16,7 @@ export default function(url, prev) {
         return null;
     }
 
-    var Synergy = global.Synergy || {};
+    global.Synergy = global.Synergy || {};
 
     let includePaths = this.options.includePaths ? this.options.includePaths.split(path.delimiter) : [];
     let paths = [].concat(prev.slice(0, prev.lastIndexOf('/'))).concat(includePaths);
@@ -33,31 +33,55 @@ export default function(url, prev) {
     try {
         const extensionlessFilename = basename(fileName, extname(fileName));
 
-        let data = require(fileName);
-        if (data.default) data = data.default;
+        let data = require(fileName).default || require(fileName);
 
-        let theme = {};
-
-        if (typeof data === 'function') {
-            theme = deepExtend(Synergy.THEME || {}, Synergy.CONFIG && Synergy.CONFIG.theme);
-            const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
-            data = deepExtend(data(theme), theme.modules[MODULE_NAME]);
+        if (extensionlessFilename === 'foundation' || fileName.indexOf('/foundation/') > -1) {
+            return Synergy.FOUNDATION = data;
         }
 
-        if (data.config) data = data.config;
+        else if (extensionlessFilename === 'theme' || fileName.indexOf('/themes/') > -1) {
+            data = (typeof data === 'function') ? data(Synergy.FOUNDATION) : data;
 
-        if (Array.isArray(data)) data = { [extensionlessFilename]: data };
+            Synergy.THEME = deepExtend(data, Synergy.APP && Synergy.APP.theme);
 
-        return {
-            contents: transformJSONtoSass({
-                config: evalConfig(data),
-                theme: theme,
-                ...(Synergy.CAST_TO_SASS)
-            }),
+            return {
+                contents: transformJSONtoSass({ theme: data })
+            }
+        }
+
+        else {
+            let theme = {};
+
+            const FOUNDATION = Object.assign({}, Synergy.FOUNDATION);
+            const THEME =  typeof Synergy.THEME === 'function' ? Synergy.THEME(FOUNDATION) : Synergy.THEME;
+            const GLOBAL_VARS = Synergy.APP && (Synergy.APP.config ? Synergy.APP.config : Synergy.APP.Synergy);
+    
+            if (typeof data === 'function') {
+                theme = deepExtend(FOUNDATION, THEME, Synergy.APP && Synergy.APP.theme);
+
+                if (theme.modules) {
+                    const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
+    
+                    data = deepExtend(data(theme), theme.modules[MODULE_NAME]);
+                } else {
+                    data = data(theme);
+                }
+            } 
+            else if (theme.modules) {
+                data = deepExtend(data, theme.modules[MODULE_NAME]);
+            }
+
+            return {
+                contents: transformJSONtoSass({
+                    [extensionlessFilename]: evalConfig(data),
+                    theme: theme,
+                    ...(GLOBAL_VARS)
+                })
+            }
         }
     }
     catch(error) {
-        return new Error(`node-sass-json-importer: Error transforming JSON/JSON5 to SASS. Check if your JSON/JSON5 parses correctly. ${error}`);
+        return new Error(`node-sass-json-importer: Error transforming JSON/JSON5 to SASS. ${fileName}. ${error}`);
     }
 }
 
