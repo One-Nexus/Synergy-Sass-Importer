@@ -40,9 +40,11 @@ export default function(url, prev) {
         }
 
         else if (extensionlessFilename === 'theme' || fileName.indexOf('/themes/') > -1) {
-            data = (typeof data === 'function') ? data(Synergy.FOUNDATION) : data;
+            const FOUNDATION = Object.assign({}, Synergy.FOUNDATION)
 
-            Synergy.THEME = deepExtend(data, Synergy.APP && Synergy.APP.theme);
+            data = (typeof data === 'function') ? data(FOUNDATION) : data;
+
+            Synergy.THEME = deepExtend(FOUNDATION, data, Synergy.APP && Synergy.APP.theme);
 
             return {
                 contents: transformJStoSass({ theme: data })
