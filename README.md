@@ -388,3 +388,12 @@ The `modules.Accordion` object will be merged with the config object and made av
 @debug map-get($config, 'fizz'); // 'buzz'
 @debug map-get($theme, 'someProperty'); // true
 ```
+
+---
+
+<a href="https://twitter.com/ESR360">
+    <img src="http://edmundreed.com/assets/images/twitter.gif?v=1" width="250px" />
+</a>
+<a href="https://github.com/ESR360">
+    <img src="http://edmundreed.com/assets/images/github.gif?v=1" width="250px" />
+</a>
