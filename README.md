@@ -1,3 +1,8 @@
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/One-Nexus/Synergy-Sass-Importer/blob/master/LICENSE)
+[![Travis build](https://api.travis-ci.com/One-Nexus/Synergy.svg)](https://travis-ci.com/One-Nexus/Synergy-Sass-Importer)
+[![npm version](https://badge.fury.io/js/%40onenexus%2Fsynergy-sass-importer.svg)](https://www.npmjs.com/package/@onenexus/synergy-sass-importer)
+[![npm downloads](https://img.shields.io/npm/dm/@onenexus/synergy-sass-importer.svg)](https://www.npmjs.com/package/@onenexus/synergy-sass-importer)
+
 <img height="56px" src="http://www.onenexus.io/synergy/github-logo.png" />
 
 > Import JavaScript/JSON files into Sass
