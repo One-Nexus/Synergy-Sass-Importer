@@ -70,6 +70,8 @@ export default function(url, prev) {
                 }
             } 
             else if (theme.modules) {
+                const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
+
                 data = deepExtend(data, theme.modules[MODULE_NAME]);
             }
 
