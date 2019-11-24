@@ -56,7 +56,7 @@ export default function(url, prev) {
     else {
       const FOUNDATION = Object.assign({}, Synergy.FOUNDATION);
       const THEME =  typeof Synergy.THEME === 'function' ? Synergy.THEME(FOUNDATION) : Synergy.THEME;
-      const GLOBAL_VARS = Synergy.APP && (Synergy.APP.options ? Synergy.APP.options : Synergy.APP.Synergy);
+      const GLOBAL_VARS = Synergy.APP && (Synergy.APP.options ? Synergy.APP.options : Synergy.APP.Synergy) || {};
 
       if (typeof data === 'function') {
         theme = deepExtend(FOUNDATION, THEME, Synergy.APP && Synergy.APP.theme);
@@ -65,6 +65,8 @@ export default function(url, prev) {
           const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
 
           data = deepExtend(data(theme), theme.modules[MODULE_NAME]);
+
+          GLOBAL_VARS.CellThemeProcessed = true;
         } else {
           data = data(theme);
         }
@@ -73,6 +75,8 @@ export default function(url, prev) {
         const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
 
         data = deepExtend(data, theme.modules[MODULE_NAME]);
+          
+        GLOBAL_VARS.CellThemeProcessed = true;
       }
 
       return {
