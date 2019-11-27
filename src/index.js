@@ -7,25 +7,20 @@ import deepExtend from 'deep-extend';
 import 'json5/lib/register'; // Enable JSON5 support
 
 /**
- * 
  * @param {*} url 
  * @param {*} prev 
  */
 export default function(url, prev) {
-  if (!isValidFile(url)) {
-    return null;
-  }
+  if (!isValidFile(url)) return null;
 
   global.Synergy = global.Synergy || {};
-
-  let theme = {};
 
   let includePaths = this.options.includePaths ? this.options.includePaths.split(path.delimiter) : [];
   let paths = [].concat(prev.slice(0, prev.lastIndexOf('/'))).concat(includePaths);
   let fileName = paths.map(path => resolve(path, url)).filter(isThere).pop();
 
   if (!fileName) {
-    return new Error(`Unable to find "${url}" from the following path(s): ${paths.join(', ')}. Check includePaths.`);
+    return new Error(`Unable to find "${url}" from the following path(s): ${paths.join(', ')}.`);
   }
 
   // Prevent file from being cached by Node's `require` on continuous builds.
@@ -37,52 +32,29 @@ export default function(url, prev) {
 
     let data = require(fileName).default || require(fileName);
 
-    if (extensionlessFilename === 'foundation' || fileName.indexOf('/foundation/') > -1) {
-      return Synergy.FOUNDATION = data;
-    }
+    if (extensionlessFilename === 'theme' || fileName.indexOf('/themes/') > -1) {
+      Synergy.THEME = data;
 
-    else if (extensionlessFilename === 'theme' || fileName.indexOf('/themes/') > -1) {
-      const FOUNDATION = Object.assign({}, Synergy.FOUNDATION)
-
-      data = (typeof data === 'function') ? data(FOUNDATION) : data;
-
-      Synergy.THEME = deepExtend(FOUNDATION, data, Synergy.APP && Synergy.APP.theme);
-
-      return {
-        contents: transformJStoSass({ theme: data })
-      }
+      return { contents: transformJStoSass({ theme: data }) }
     }
 
     else {
-      const FOUNDATION = Object.assign({}, Synergy.FOUNDATION);
-      const THEME =  typeof Synergy.THEME === 'function' ? Synergy.THEME(FOUNDATION) : Synergy.THEME;
-      const GLOBAL_VARS = Synergy.APP && (Synergy.APP.options ? Synergy.APP.options : Synergy.APP.Synergy) || {};
+      const theme = Synergy.THEME || {};
+      const GLOBAL_VARS = theme.SassGlobalVars || {};
 
-      if (typeof data === 'function') {
-        theme = deepExtend(FOUNDATION, THEME, Synergy.APP && Synergy.APP.theme);
+      if (typeof data === 'function') data = data(theme);
 
-        if (theme.modules) {
-          const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
-
-          data = deepExtend(data(theme), theme.modules[MODULE_NAME]);
-
-          GLOBAL_VARS.CellThemeProcessed = true;
-        } else {
-          data = data(theme);
-        }
-      } 
-      else if (theme.modules) {
-        const MODULE_NAME = Object.keys(theme.modules).filter(key => fileName.indexOf(key) > -1)[0];
-
-        data = deepExtend(data, theme.modules[MODULE_NAME]);
+      if (theme.modules) {
+        data = deepExtend(data, theme.modules[data.name]);
           
-        GLOBAL_VARS.CellThemeProcessed = true;
+        GLOBAL_VARS.CellThemeProcessed = true;       
       }
 
       return {
         contents: transformJStoSass({
           [extensionlessFilename]: evalConfig(data, theme),
           theme: theme,
+
           ...(GLOBAL_VARS)
         })
       }
@@ -106,7 +78,6 @@ function evalConfig(config, theme) {
     } else {
       if (typeof value !== 'function') return;
 
-      // return config[key] = value();
       return config[key] = value(theme);
     }
   });

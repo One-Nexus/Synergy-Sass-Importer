@@ -96,8 +96,7 @@ describe('Import type test (JSON)', function() {
 
     expect(render).to.throw(
       'Unable to find "variables.json" from the following path(s): ' +
-      `${resolve(process.cwd(), 'test/fixtures/include-paths')}, ${process.cwd()}, ./test/fixtures/include-paths/foo. ` +
-      'Check includePaths.'
+      `${resolve(process.cwd(), 'test/fixtures/include-paths')}, ${process.cwd()}, ./test/fixtures/include-paths/foo.`
     );
   });
 
@@ -206,8 +205,7 @@ describe('Import type test (JSON5)', function() {
 
     expect(render).to.throw(
       'Unable to find "variables.json5" from the following path(s): ' +
-      `${resolve(process.cwd(), 'test/fixtures-json5/include-paths')}, ${process.cwd()}, ./test/fixtures-json5/include-paths/foo. ` +
-      'Check includePaths.'
+      `${resolve(process.cwd(), 'test/fixtures-json5/include-paths')}, ${process.cwd()}, ./test/fixtures-json5/include-paths/foo.`
     );
   });
 
