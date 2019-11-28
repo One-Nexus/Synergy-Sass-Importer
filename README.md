@@ -11,6 +11,10 @@
 * [Setup](#setinstallation--setup)
 * [Usage](#usage)
 
+<table>
+  <tr><td><a href="https://codesandbox.io/s/cell-demo--js-iklx3">View CodeSandbox Demo</a></td></tr>
+</table>
+
 ## Overview
 
 Synergy-Sass-Importer allows you to import JavaScript/JSON/json5 files into your Sass files. It was built for the [Cell library](https://github.com/One-Nexus/Synergy) (which in turn was built for the [Synergy framework](https://github.com/One-Nexus/Synergy)) but can be used with any projects that use Node.js and Sass.
