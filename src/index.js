@@ -51,6 +51,7 @@ export default function(url, prev) {
       }
 
       return {
+        file: fileName,
         contents: transformJStoSass({
           [extensionlessFilename]: evalConfig(data, theme),
           theme: theme,

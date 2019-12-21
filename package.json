@@ -1,8 +1,8 @@
 {
   "name": "@onenexus/synergy-sass-importer",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "Import JavaScript/JSON files into Sass",
-  "main": "dist/synergy-sass-importer.js",
+  "main": "src/synergy-sass-importer.js",
   "license": "MIT",
   "repository": {
     "type": "git",
