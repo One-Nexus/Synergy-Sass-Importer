@@ -134,7 +134,9 @@ There are several uses for themes:
 * Share common properties between UI components
 * Change entire project look and feel on the fly by switching themes
 
-From what we've seen so far, we can already import a JavaScript/JSON theme into our Sass and access the values:
+Themes can be imported like other files:
+
+> For Synergy-Sass-Importer to know that an imported file is intended to be a theme, it must either be called `theme.{js|json}` or have a direct parent/grand-parent directory called `themes`
 
 ###### themes/myTheme.json
 
@@ -183,7 +185,7 @@ export default (theme) => ({
 });
 ```
 
-The theme (provided it has been imported into your Sass) will automatically be passed to the function which will be evaluated, and the returned object will be converted to a Sass map.
+The theme (provided it has been correctly imported into your Sass) will automatically be passed to the function which will be evaluated, and the returned object will be converted to a Sass map.
 
 ###### components/myComponent/styles.scss
 
