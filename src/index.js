@@ -33,9 +33,11 @@ export default function(url, prev) {
     let data = require(fileName).default || require(fileName);
 
     if (extensionlessFilename === 'theme' || fileName.indexOf('/themes/') > -1) {
-      Synergy.THEME = data;
+      const EVALUATED_THEME = evalTheme(data);
 
-      return { contents: transformJStoSass({ theme: data }) }
+      Synergy.THEME = EVALUATED_THEME;
+
+      return { contents: transformJStoSass({ theme: EVALUATED_THEME }) }
     }
 
     else {
@@ -53,7 +55,7 @@ export default function(url, prev) {
       return {
         file: fileName,
         contents: transformJStoSass({
-          [extensionlessFilename]: evalConfig(data, theme),
+          [extensionlessFilename]: data,
           theme: theme,
 
           ...(GLOBAL_VARS)
@@ -67,23 +69,30 @@ export default function(url, prev) {
 }
 
 /**
- * Evaluate module config properties
- * @param {*} config 
+ * Evaluate theme properties
+ * @param {*} theme 
+ * @param {*} core 
  */
-function evalConfig(config, theme) {
-  if (!config) return;
+function evalTheme(theme, core = theme) {
+  if (!theme) return;
+  if (Array.isArray(theme)) return theme;
 
-  Object.entries(config).forEach(([key, value]) => {
+  let result = {}
+
+  Object.entries(theme).forEach(([key, value]) => {
     if (typeof value === 'object') {
-      return evalConfig(value, theme);
-    } else {
-      if (typeof value !== 'function') return;
-
-      return config[key] = value(theme);
+      result[key] = evalTheme(value, core);
+    }
+    else {
+      if (typeof value === 'function') {
+        result[key] = value(core);
+      } else {
+        result[key] = value;
+      }
     }
   });
 
-  return config;
+  return result;
 }
 
 /**
