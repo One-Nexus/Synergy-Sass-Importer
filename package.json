@@ -23,13 +23,13 @@
     "deep-extend": "^0.6.0",
     "is-there": "^4.0.0",
     "json5": "^1.0",
-    "lodash": "^4.17"
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.2.0",
     "mocha": "^2.3.2",
-    "node-sass": ">=3.5.3"
+    "node-sass": "^4.13.1"
   },
   "scripts": {
     "test": "mocha --compilers js:babel/register",
