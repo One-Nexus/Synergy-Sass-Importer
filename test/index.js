@@ -11,7 +11,7 @@ import {resolve}                              from 'path';
 const requiredImporter = require('../src/index');
 const EXPECTATION = 'body {\n  color: #c33; }\n';
 
-describe('node-sass-json-importer', function() {
+describe('node-synergy-sass-importer', function() {
   // TODO: Added to verify named exports + CommonJS default export hack (see index.js).
   it('provides the default export when using node require to import', function() {
     let result = sass.renderSync({

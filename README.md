@@ -49,7 +49,7 @@ sass.render({
 
 // Example 2
 var result = sass.renderSync({
-  data: scss_content
+  data: scss_content,
   importer: [SynergySassImporter, someOtherImporter]
   ...options
 });
@@ -68,13 +68,13 @@ node-sass /PATH/TO/app.scss --importer node_modules/synergy-sass-importer/dist/s
 ###### ES6 Imports
 
 ```js
-import SassJSONImporter from '@onenexus/sass-json-importer';
+import SassJSONImporter from '@onenexus/synergy-sass-importer';
 ```
 
 ###### CommonJS
 
 ```js
-const SassJSONImporter = require('@onenexus/sass-json-importer');
+const SassJSONImporter = require('@onenexus/synergy-sass-importer');
 ```
 
 ###### Configuration
@@ -86,10 +86,24 @@ const SassJSONImporter = require('@onenexus/sass-json-importer');
     {
       loader: 'sass-loader', 
       options: {
-        importer: SynergySassImporter
+        sassOptions: {
+          importer: SynergySassImporter
+        }
       }
     }
   ]
+}
+```
+
+### `.sassrc.js`
+
+> Useful if using [Parcel.js](https://parceljs.org/)
+
+```js
+const SassJSONImporter = require('@onenexus/synergy-sass-importer');
+
+module.exports = {
+  importer: SynergySassImporter
 }
 ```
 
@@ -211,9 +225,12 @@ Rather than importing the theme into your Sass manually, you can expose it to No
 
 ---
 
-<a href="https://twitter.com/ESR360">
-    <img src="http://edmundreed.com/assets/images/twitter.gif?v=1" width="250px" />
-</a>
 <a href="https://github.com/ESR360">
-    <img src="http://edmundreed.com/assets/images/github.gif?v=1" width="250px" />
+  <img src="http://edmundreed.com/assets/images/github.gif?v=1" width="230px" />
+</a>
+<a href="https://twitter.com/ESR360">
+  <img src="http://edmundreed.com/assets/images/twitter.gif?v=1" width="230px" />
+</a>
+<a href="https://www.instagram.com/edmund_reed/">
+  <img src="http://edmundreed.com/assets/images/insta.png" width="230px" />
 </a>

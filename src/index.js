@@ -24,7 +24,7 @@ export default function(url, prev) {
   }
 
   // Prevent file from being cached by Node's `require` on continuous builds.
-  // https://github.com/Updater/node-sass-json-importer/issues/21
+  // https://github.com/Updater/node-synergy-sass-importer/issues/21
   delete require.cache[require.resolve(fileName)];
 
   try {
@@ -186,7 +186,7 @@ export function valueShouldBeStringified(value) {
 
 // Super-hacky: Override Babel's transpiled export to provide both
 // a default CommonJS export and named exports.
-// Fixes: https://github.com/Updater/node-sass-json-importer/issues/32
+// Fixes: https://github.com/Updater/node-synergy-sass-importer/issues/32
 // TODO: Remove in 3.0.0. Upgrade to Babel6.
 module.exports = exports.default;
 Object.keys(exports).forEach(key => module.exports[key] = exports[key]);
